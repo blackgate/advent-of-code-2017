@@ -12,23 +12,17 @@
 (def start-square
   (parse-square ".#./..#/###"))
 
-(defn square-col [square col]
-  (->> (range (count square))
-       (mapv #(get-in square [% col]))))
+(defn transpose [square]
+  (apply mapv vector square))
+
+(defn flip-square [square]
+  (->> square reverse vec))
 
 (defn rotate-square [square]
-  (->> (range (count square))
-       (reverse)
-       (mapv #(square-col square %))))
+  (->> square transpose flip-square))
 
 (defn square-rotations [square]
   (take 4 (iterate rotate-square square)))
-
-(defn flip-v-square [square]
-  (vec (reverse square)))
-
-(defn flip-h-square [square]
-  (mapv (comp vec reverse) square))
 
 (defn sub-square [square [start-x start-y] size]
   (mapv
@@ -40,15 +34,14 @@
   (let [size (count square)
         sub-size (if (zero? (rem size 2)) 2 3)]
     (->> (for [x (range 0 size sub-size)]
-           (->> (for [y (range 0 size sub-size)]
-                  (let [sub-square (sub-square square [x y] sub-size)]
-                    (get rules sub-square)))
-                (apply mapv (comp vec concat))))
+           (for [y (range 0 size sub-size)]
+             (get rules (sub-square square [x y] sub-size))))
+         (mapv #(apply mapv (comp vec concat)))
          (reduce into []))))
 
 (defn square-variations [square]
   (->> (square-rotations square)
-       (mapcat #(vector % (flip-v-square %) (flip-h-square %)))))
+       (mapcat #(vector % (flip-square %)))))
        
 (defn add-square-variations [rules [k v]]
   (->> (square-variations k)
