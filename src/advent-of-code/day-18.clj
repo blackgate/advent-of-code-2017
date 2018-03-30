@@ -46,8 +46,7 @@
 (defn read-instructions [input]
   (->> (str/split-lines input)
        (map #(str "(" % ")"))
-       (map read-string)
-       (into [])))
+       (mapv read-string)))
 
 (defn run-until-stuck [inst start-state]  
   (loop [state start-state]

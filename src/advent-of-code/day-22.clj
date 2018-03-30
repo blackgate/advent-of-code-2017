@@ -82,10 +82,7 @@
        (first)
        :infected-count))
 
-(def test-input
-  "..#
-#..
-...")
+(def test-input "..#\n#..\n...")
 
 (deftest part-1-tests
   (testing "how many bursts cause a node to become infected"
