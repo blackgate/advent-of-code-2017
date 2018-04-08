@@ -11,18 +11,17 @@
   (filter (fn [[a b]] (or (= a port) (= b port))) comps))
 
 (defn bridges-of
+  ([comps]
+   (let [first-comps (filter #(zero? (first %)) comps)]
+     (flatten (map #(bridges-of (disj comps %) %) first-comps))))
   ([comps bridge]   
    (let [last-port (last bridge)
          next-comps (find-valid-components comps last-port)]
      (if (empty? next-comps)
-       [{:strength (reduce + bridge)
-         :length (count bridge)}]
-       (mapcat
-        #(bridges-of (disj comps %) (add-component bridge %))
-        next-comps))))
-  ([comps]
-   (let [first-comps (filter #(zero? (first %)) comps)]
-     (mapcat #(bridges-of (disj comps %) %) first-comps))))
+       {:strength (reduce + bridge)
+        :length (count bridge)}
+       (map #(bridges-of (disj comps %) (add-component bridge %))
+            next-comps)))))
 
 (defn parse-input [input]
   (->> (str/split-lines input)
